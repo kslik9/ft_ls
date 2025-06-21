@@ -1,148 +1,74 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   file_list.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/21 12:08:42 by kslik             #+#    #+#             */
+/*   Updated: 2025/06/21 12:15:09 by kslik            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_ls.h"
 
-t_file *create_file_node(const char *name, const char *path)
+static void	cleanup_file_node(t_file *new_file)
 {
-    t_file *new_file;
-    
-    new_file = malloc(sizeof(t_file));
-    if (!new_file)
-        return (NULL);
-    
-    new_file->name = ft_strdup(name);
-    new_file->path = ft_strdup(path);
-    new_file->next = NULL;
-    
-    if (!new_file->name || !new_file->path)
-    {
-        if (new_file->name)
-            free(new_file->name);
-        if (new_file->path)
-            free(new_file->path);
-        free(new_file);
-        return (NULL);
-    }
-    
-    if (lstat(path, &new_file->stat) == -1)
-    {
-        handle_stat_error(path);
-        free(new_file->name);
-        free(new_file->path);
-        free(new_file);
-        return (NULL);
-    }
-    
-    return (new_file);
+	if (new_file->name)
+		free(new_file->name);
+	if (new_file->path)
+		free(new_file->path);
+	free(new_file);
 }
 
-void add_file_to_list(t_file **head, t_file *new_file)
+static t_file	*handle_stat_failure(t_file *new_file, const char *path)
 {
-    if (!*head)
-    {
-        *head = new_file;
-        return;
-    }
-    
-    new_file->next = *head;
-    *head = new_file;
+	handle_stat_error(path);
+	cleanup_file_node(new_file);
+	return (NULL);
 }
 
-void free_file_list(t_file *head)
+t_file	*create_file_node(const char *name, const char *path)
 {
-    t_file *temp;
-    
-    while (head)
-    {
-        temp = head;
-        head = head->next;
-        free(temp->name);
-        free(temp->path);
-        free(temp);
-    }
+	t_file	*new_file;
+
+	new_file = malloc(sizeof(t_file));
+	if (!new_file)
+		return (NULL);
+	new_file->name = ft_strdup(name);
+	new_file->path = ft_strdup(path);
+	new_file->next = NULL;
+	if (!new_file->name || !new_file->path)
+	{
+		cleanup_file_node(new_file);
+		return (NULL);
+	}
+	if (lstat(path, &new_file->stat) == -1)
+		return (handle_stat_failure(new_file, path));
+	return (new_file);
 }
 
-static t_file *merge_files(t_file *left, t_file *right, int flags)
+void	add_file_to_list(t_file **head, t_file *new_file)
 {
-    t_file *result = NULL;
-    t_file **tail = &result;
-    int compare;
-    
-    while (left && right)
-    {
-        if (flags & FLAG_T)
-        {
-            if (left->stat.st_mtime > right->stat.st_mtime)
-                compare = -1;
-            else if (left->stat.st_mtime < right->stat.st_mtime)
-                compare = 1;
-            else if (left->stat.st_mtimespec.tv_nsec > right->stat.st_mtimespec.tv_nsec)
-                compare = -1;
-            else if (left->stat.st_mtimespec.tv_nsec < right->stat.st_mtimespec.tv_nsec)
-                compare = 1;
-            else
-                compare = ft_strcmp(left->name, right->name);
-
-        }
-        else
-        {
-            compare = ft_strcmp(left->name, right->name);
-        }
-        
-        if (flags & FLAG_r)
-            compare = -compare;
-        
-        if (compare <= 0)
-        {
-            *tail = left;
-            left = left->next;
-        }
-        else
-        {
-            *tail = right;
-            right = right->next;
-        }
-        tail = &(*tail)->next;
-    }
-    
-    *tail = left ? left : right;
-    return (result);
+	if (!*head)
+	{
+		*head = new_file;
+		return ;
+	}
+	new_file->next = *head;
+	*head = new_file;
 }
 
-static t_file *merge_sort_files(t_file *head, int flags)
+void	free_file_list(t_file *head)
 {
-    t_file *slow;
-    t_file *fast;
-    t_file *prev;
-    t_file *left;
-    t_file *right;
-    
-    if (!head || !head->next)
-        return (head);
-    
-    // Find middle using slow/fast pointers
-    slow = fast = head;
-    prev = NULL;
-    
-    while (fast && fast->next)
-    {
-        prev = slow;
-        slow = slow->next;
-        fast = fast->next->next;
-    }
-    
-    // Split the list
-    prev->next = NULL;
-    left = head;
-    right = slow;
-    
-    // Recursively sort both halves
-    left = merge_sort_files(left, flags);
-    right = merge_sort_files(right, flags);
-    
-    // Merge the sorted halves
-    return (merge_files(left, right, flags));
-}
+	t_file	*temp;
 
-t_file *sort_files(t_file *head, int flags)
-{
-    return (merge_sort_files(head, flags));
+	while (head)
+	{
+		temp = head;
+		head = head->next;
+		free(temp->name);
+		free(temp->path);
+		free(temp);
+	}
 }

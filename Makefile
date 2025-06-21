@@ -6,7 +6,7 @@
 #    By: kslik <kslik@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/19 10:13:56 by kslik             #+#    #+#              #
-#    Updated: 2025/06/19 10:24:18 by kslik            ###   ########.fr        #
+#    Updated: 2025/06/21 12:53:23 by kslik            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,9 +22,17 @@ INCLUDES = -I.
 # Source files
 SRCS = main.c \
        ft_ls.c \
+	   ft_ls2.c \
        file_list.c \
        display.c \
-       utils.c
+       utils.c \
+	   simple.c \
+	   time.c \
+	   utils_2.c \
+	   file_sort.c \
+	   file_emrge.c \
+	   utils_3.c
+	   
 
 # Object files
 OBJS = $(SRCS:.c=.o)

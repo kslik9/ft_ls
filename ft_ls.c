@@ -1,121 +1,91 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_ls.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/21 12:18:51 by kslik             #+#    #+#             */
+/*   Updated: 2025/06/21 12:25:36 by kslik            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_ls.h"
 
-void ft_ls(t_ls *ls)
+static void	print_directory_header(const char *path, int i, int path_count)
 {
-    int i;
-    struct stat st;
-    
-    for (i = 0; i < ls->path_count; i++)
-    {
-        if (stat(ls->paths[i], &st) == -1)
-        {
-            handle_stat_error(ls->paths[i]);
-            continue;
-        }
-        
-        if (S_ISDIR(st.st_mode))
-        {
-            if (ls->path_count > 1)
-            {
-                if (i > 0)
-                    ft_putchar('\n');
-                ft_putstr(ls->paths[i]);
-                ft_putendl(":");
-            }
-            process_directory(ls->paths[i], ls, 0);
-        }
-        else
-        {
-            process_file(ls->paths[i], ls);
-        }
-    }
+	if (path_count > 1)
+	{
+		if (i > 0)
+			ft_putchar('\n');
+		ft_putstr(path);
+		ft_putendl(":");
+	}
 }
 
-void process_directory(const char *path, t_ls *ls, int is_recursive)
+static void	process_single_path(t_ls *ls, int i)
 {
-    DIR *dir;
-    struct dirent *entry;
-    t_file *files = NULL;
-    t_file *current;
-    char *full_path;
-    size_t path_len;
-    
-    dir = opendir(path);
-    if (!dir)
-    {
-        print_error(path, "cannot open directory");
-        return;
-    }
-    
-    path_len = ft_strlen(path);
-    
-    while ((entry = readdir(dir)) != NULL)
-    {
-        // Skip hidden files if -a flag not set
-        if (!(ls->flags & FLAG_A) && entry->d_name[0] == '.')
-            continue;
-        
-        // Create full path
-        full_path = malloc(path_len + ft_strlen(entry->d_name) + 2);
-        if (!full_path)
-            continue;
-        
-        ft_strcpy(full_path, path);
-        if (path_len > 0 && path[path_len - 1] != '/')
-        {
-            full_path[path_len] = '/';
-            full_path[path_len + 1] = '\0';
-            ft_strcat(full_path, entry->d_name);
-        }
-        else
-        {
-            ft_strcat(full_path, entry->d_name);
-        }
-        
-        t_file *new_file = create_file_node(entry->d_name, full_path);
-        free(full_path);
-        
-        if (new_file)
-            add_file_to_list(&files, new_file);
-    }
-    
-    closedir(dir);
-    
-    if (files)
-    {
-        files = sort_files(files, ls->flags);
-        display_files(files, ls, path);
-        
-        // Handle recursive flag
-        if (ls->flags & FLAG_R)
-        {
-            current = files;
-            while (current)
-            {
-                if (S_ISDIR(current->stat.st_mode) && 
-                    ft_strcmp(current->name, ".") != 0 && 
-                    ft_strcmp(current->name, "..") != 0)
-                {
-                    ft_putchar('\n');
-                    ft_putstr(current->path);
-                    ft_putendl(":");
-                    process_directory(current->path, ls, 1);
-                }
-                current = current->next;
-            }
-        }
-        
-        free_file_list(files);
-    }
+	struct stat	st;
+
+	if (stat(ls->paths[i], &st) == -1)
+	{
+		handle_stat_error(ls->paths[i]);
+		return ;
+	}
+	if (S_ISDIR(st.st_mode))
+	{
+		print_directory_header(ls->paths[i], i, ls->path_count);
+		process_directory(ls->paths[i], ls, 0);
+	}
+	else
+	{
+		process_file(ls->paths[i], ls);
+	}
 }
 
-void process_file(const char *path, t_ls *ls)
+void	ft_ls(t_ls *ls)
 {
-    t_file *file = create_file_node(path, path);
-    
-    if (file)
-    {
-        display_files(file, ls, NULL);
-        free_file_list(file);
-    }
+	int	i;
+
+	i = 0;
+	while (i < ls->path_count)
+	{
+		process_single_path(ls, i);
+		i++;
+	}
+}
+
+void	process_directory(const char *path, t_ls *ls, int is_recursive)
+{
+	DIR		*dir;
+	t_file	*files;
+
+	files = NULL;
+	dir = opendir(path);
+	if (!dir)
+	{
+		print_error(path, "cannot open directory");
+		return ;
+	}
+	read_directory_entries(dir, path, &files, ls);
+	closedir(dir);
+	if (files)
+	{
+		files = sort_files(files, ls->flags);
+		display_files(files, ls, path);
+		handle_recursive_directories(files, ls);
+		free_file_list(files);
+	}
+}
+
+void	process_file(const char *path, t_ls *ls)
+{
+	t_file	*file;
+
+	file = create_file_node(path, path);
+	if (file)
+	{
+		display_files(file, ls, NULL);
+		free_file_list(file);
+	}
 }
