@@ -6,7 +6,7 @@
 /*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 12:24:06 by kslik             #+#    #+#             */
-/*   Updated: 2025/06/21 12:33:18 by kslik            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:07:31 by kslik            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	handle_recursive_directories(t_file *files, t_ls *ls)
 {
 	t_file	*current;
 
-	if (!(ls->flags & FLAG_R))
+	if (!(ls->flags & FLAG_CAP_R))
 		return ;
 	current = files;
 	while (current)
@@ -90,7 +90,7 @@ void	handle_recursive_directories(t_file *files, t_ls *ls)
 			ft_putchar('\n');
 			ft_putstr(current->path);
 			ft_putendl(":");
-			process_directory(current->path, ls, 1);
+			process_directory(current->path, ls);
 		}
 		current = current->next;
 	}

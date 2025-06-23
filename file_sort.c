@@ -6,7 +6,7 @@
 /*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 12:12:38 by kslik             #+#    #+#             */
-/*   Updated: 2025/06/21 12:21:40 by kslik            ###   ########.fr       */
+/*   Updated: 2025/06/23 09:41:05 by kslik            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	get_compare_result(t_file *left, t_file *right, int flags)
 		compare = compare_by_time(left, right);
 	else
 		compare = ft_strcmp(left->name, right->name);
-	if (flags & FLAG_r)
+	if (flags & FLAG_R)
 		compare = -compare;
 	return (compare);
 }

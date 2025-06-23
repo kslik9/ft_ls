@@ -6,7 +6,7 @@
 /*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 12:18:51 by kslik             #+#    #+#             */
-/*   Updated: 2025/06/21 12:25:36 by kslik            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:08:46 by kslik            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static void	process_single_path(t_ls *ls, int i)
 	if (S_ISDIR(st.st_mode))
 	{
 		print_directory_header(ls->paths[i], i, ls->path_count);
-		process_directory(ls->paths[i], ls, 0);
+		process_directory(ls->paths[i], ls);
 	}
 	else
 	{
@@ -55,7 +55,7 @@ void	ft_ls(t_ls *ls)
 	}
 }
 
-void	process_directory(const char *path, t_ls *ls, int is_recursive)
+void	process_directory(const char *path, t_ls *ls)
 {
 	DIR		*dir;
 	t_file	*files;
@@ -72,7 +72,7 @@ void	process_directory(const char *path, t_ls *ls, int is_recursive)
 	if (files)
 	{
 		files = sort_files(files, ls->flags);
-		display_files(files, ls, path);
+		display_files(files, ls);
 		handle_recursive_directories(files, ls);
 		free_file_list(files);
 	}
@@ -85,7 +85,7 @@ void	process_file(const char *path, t_ls *ls)
 	file = create_file_node(path, path);
 	if (file)
 	{
-		display_files(file, ls, NULL);
+		display_files(file, ls);
 		free_file_list(file);
 	}
 }

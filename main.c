@@ -6,7 +6,7 @@
 /*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 12:26:00 by kslik             #+#    #+#             */
-/*   Updated: 2025/06/21 12:49:22 by kslik            ###   ########.fr       */
+/*   Updated: 2025/06/23 09:41:32 by kslik            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ void	filter_arg(t_ls *ls, char **argv, int i, int j)
 	if (argv[i][j] == 'l')
 		ls->flags |= FLAG_L;
 	else if (argv[i][j] == 'R')
-		ls->flags |= FLAG_R;
+		ls->flags |= FLAG_CAP_R;
 	else if (argv[i][j] == 'a')
 		ls->flags |= FLAG_A;
 	else if (argv[i][j] == 'r')
-		ls->flags |= FLAG_r;
+		ls->flags |= FLAG_R;
 	else if (argv[i][j] == 't')
 		ls->flags |= FLAG_T;
 	else

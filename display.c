@@ -6,7 +6,7 @@
 /*   By: kslik <kslik@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/21 11:24:22 by kslik             #+#    #+#             */
-/*   Updated: 2025/06/21 12:08:22 by kslik            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:07:44 by kslik            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	print_padded_string(const char *str, int width, int left_align)
 	}
 }
 
-void	display_files(t_file *files, t_ls *ls, const char *dir_path)
+void	display_files(t_file *files, t_ls *ls)
 {
 	long	total_blocks;
 	t_file	*current;
